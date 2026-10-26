@@ -1,13 +1,13 @@
 # SARAS Lab — Project Plan
 
-> An interactive **3D assembly workbench**, an **extensible hardware library with compatibility checks**, and a **complete build tutorial** for the SARAS AI robot (Smart Autonomous Robotic AI System), based on Tech With Anant's two videos.
+> Our own **3D robotics lab**: a fully interactive, animated 3D workbench where we design, build, wire, check and test robot designs (starting with SARAS, the Smart Autonomous Robotic AI System from Tech With Anant's videos), plus an extensible hardware library, design versions with side-by-side compare, a lab notebook for test runs, and the complete build tutorial.
 
 | | |
 |---|---|
 | **Status** | v0.1 — planning. Nothing is built yet. This file is the source of truth for *what* we build and *in what order*. |
 | **Source videos** | [Hardware Build (Aug 15, 2025)](https://www.youtube.com/watch?v=IT1uBUsOmUY) · [System Overview (Jul 5, 2025)](https://www.youtube.com/watch?v=e-nbSGRFP4Q) |
-| **Look & feel** | Clean beige, lots of air, sticky header, serif headings, mono for pins and code |
-| **Shape** | Static site, no backend, local-first (builds saved in the browser, exportable as JSON) |
+| **Look & feel** | Clean beige, lots of air, sticky header, serif headings, mono for pins and code. **3D-first**: wherever hardware is shown it is real, rotatable, animated 3D, never a flat image. |
+| **Shape** | A personal lab for us, not a public product. Single-user, static, no backend, local-first (designs saved in the browser, exportable as JSON). |
 
 ---
 
@@ -22,7 +22,7 @@
 7. [Architecture and tech stack](#7-architecture-and-tech-stack)
 8. [Data model](#8-data-model)
 9. [The SARAS reference build](#9-the-saras-reference-build)
-10. [3D Workbench spec](#10-3d-workbench-spec)
+10. [3D Workbench spec](#10-3d-workbench-spec) — scene, interactions, **animation spec**, chassis designer, STL import, design versions, compare, notebook
 11. [Check and Test engine](#11-check-and-test-engine)
 12. [Hardware library: adding your own parts](#12-hardware-library-adding-your-own-parts)
 13. [Tutorial content plan](#13-tutorial-content-plan)
@@ -40,34 +40,36 @@
 
 ## 1. What we are building
 
-Three products, one website, one shared data model.
+**A personal 3D robotics lab.** The 3D Workbench is the product; everything else exists to feed it or to record what it finds. We design a robot (starting from SARAS), build it virtually, check it, test it, change it, and keep every version. The site is for us, so there is no marketing layer: the home page is the lab bench with the current design spinning on it.
 
-1. **Workbench** — a 3D scene where you drag real-size components (Raspberry Pi, L298N, DC motors, 7" display, camera, ultrasonic sensors, mic, speaker, batteries) onto a virtual SARAS chassis, wire them pin to pin, press **Check** to find mistakes, and press **Test** to drive the robot virtually and watch the sensors and power rails respond.
-2. **Parts** — a catalog of hardware with dimensions, pins, voltages, current draw, mass, price and purchase links. You can add your own parts through a form, and the Workbench and the checker understand them immediately.
-3. **Tutorial** — the full SARAS build, hardware track and software track, as a step-by-step guide. Every step has a checkpoint that opens the Workbench in the matching state.
+1. **Workbench** — a live 3D scene you can orbit, rotate, zoom, pan and explode with the mouse, trackpad, touch or keyboard. Drag real-size components (Raspberry Pi, L298N, DC motors, 7" display, camera, ultrasonic sensors, mic, speaker, batteries) onto a chassis, snap them in, wire them pin to pin, press **Check** to find mistakes, and press **Test** to drive the robot on a virtual floor and watch the wheels, sensors, face and power rails respond. Everything is animated: parts fly into place, wires draw themselves, wheels spin, sensor cones ping, the face on the display changes state.
+2. **Designs and versions** — every build is a saved design with versions. Duplicate SARAS v1, swap the L298N for a TB6612FNG and the 18650s for a LiPo, and compare the two side by side in 3D with their mass, cost, power budget and wiring differences.
+3. **Chassis designer** — change length, width, tier gaps, motor offsets and wheel size with sliders and watch the chassis rebuild live, or import our own STL / GLB / OBJ from Fusion 360 and place real parts on it.
+4. **Parts** — a catalog of hardware with dimensions, pins, voltages, current draw, mass and price. Every part card is a small rotating 3D model. Add our own parts through a form; the Workbench and the checker understand them immediately.
+5. **Lab notebook** — each design keeps a log of test runs (check results, drive / sensor / power observations) and our own notes and photos of the physical build, so the virtual and the real robot stay in step.
+6. **Tutorial** — the full SARAS build, hardware and software tracks, with every step opening the Workbench in the matching state. It is our reference while we build the physical robot.
 
-Plus a **Cost** planner (USD / INR bill of materials), because that was the most-asked question on the original video.
+Plus a **Cost** view (USD / INR bill of materials) per design.
 
-The thing that makes it "one product" rather than three: **a single `Build` document** (parts placed + wires + settings) that the Workbench edits, the checker validates, the Test mode simulates, the Cost page prices, and the Tutorial steps load.
+What ties it together: **a single `Build` document per design version** (chassis + parts placed + wires + settings) that the Workbench edits, the checker validates, the Test mode simulates, the Cost page prices, Compare diffs, the Notebook pins entries to, and the Tutorial steps load.
 
 ```
-                ┌──────────────┐
-                │  Parts       │  catalog JSON (built-in + yours)
-                │  Library     │
-                └──────┬───────┘
-                       │ components, pins, power, dims
-                       ▼
-┌────────────┐   ┌──────────────┐   ┌──────────────┐
-│  Tutorial  │──▶│  Build       │◀──│  Workbench   │  place, wire, inspect (3D)
-│  steps     │   │  document    │   └──────────────┘
-└────────────┘   └──────┬───────┘
-                        │
-         ┌──────────────┼──────────────┐
-         ▼              ▼              ▼
-   ┌──────────┐   ┌──────────┐   ┌──────────┐
-   │  Check   │   │  Test    │   │  Cost    │
-   │  rules   │   │  sim     │   │  BOM     │
-   └──────────┘   └──────────┘   └──────────┘
+                ┌──────────────┐        ┌──────────────┐
+                │  Parts       │        │  Chassis     │  parametric plates or
+                │  Library     │        │  designer    │  imported STL / GLB / OBJ
+                └──────┬───────┘        └──────┬───────┘
+                       │ components, pins      │ geometry
+                       ▼                       ▼
+┌────────────┐   ┌─────────────────────────────────┐   ┌──────────────┐
+│  Tutorial  │──▶│  Design = Build document, v1…vN  │◀──│  Workbench   │  3D: place, wire, animate
+│  steps     │   └───────────────┬─────────────────┘   └──────────────┘
+└────────────┘                   │
+         ┌──────────────┬────────┼─────────┬──────────────┐
+         ▼              ▼        ▼         ▼              ▼
+   ┌──────────┐   ┌──────────┐ ┌──────┐ ┌──────────┐ ┌──────────┐
+   │  Check   │   │  Test    │ │ Cost │ │ Compare  │ │ Notebook │
+   │  rules   │   │  sim     │ │ BOM  │ │ designs  │ │ test log │
+   └──────────┘   └──────────┘ └──────┘ └──────────┘ └──────────┘
 ```
 
 ## 2. Goals and non-goals
@@ -81,7 +83,10 @@ The thing that makes it "one product" rather than three: **a single `Build` docu
 | G3 | Adding a new part takes under 5 minutes and needs no code. | Add-part form → part appears in Workbench drawer and passes/fails checks. |
 | G4 | The three real failures from the videos are detected. | Shared power bank, motor pair polarity, and big-tire torque each fire a rule in a regression test. |
 | G5 | It feels calm and professional. | Beige theme, consistent header/footer, Lighthouse ≥ 90 on all pages. |
-| G6 | It works offline after first load. | PWA with precached catalog and models (stretch, M7). |
+| G6 | It works offline after first load. | PWA with precached catalog and models. |
+| G7 | Hardware is always shown in real 3D that can be rotated, never as a static image. | Home bench, part cards, part detail, tutorial step panels and the Workbench all render live 3D from the same models. |
+| G8 | The design loop is fast: duplicate → change → check → test → compare → record. | A new version of a design can be created, modified, tested and logged in under five minutes. |
+| G9 | Animation makes the state legible, not decorative. | Every animation in §10 maps to a state change (placed, wired, failing, moving, sensing) and has a reduced-motion fallback. |
 
 ### Non-goals for v1
 
@@ -90,6 +95,7 @@ The thing that makes it "one product" rather than three: **a single `Build` docu
 - No accounts or backend. Builds live in the browser and in exported JSON files.
 - Not a CAD tool. No mesh editing. Chassis is a parametric placeholder until real STL/STEP files are available.
 - No in-site AI chat in v1.
+- Not a public product: no SEO work, no marketing pages, no analytics, no sign-up. If we ever open it up, that is a separate milestone.
 
 ## 3. Source material and what we extracted
 
@@ -130,57 +136,66 @@ The thing that makes it "one product" rather than three: **a single `Build` docu
 
 ## 4. Users and user stories
 
-**Personas**
+**Primary user: us.** This is a personal lab. One or two people designing, building and testing robots, on a desktop with a mouse most of the time, and on a phone or tablet to look at a design or check a wiring table next to the physical robot.
 
-- **First-time builder** (the videos' audience, often in India or the US): has a Pi, has never wired a motor driver, wants to not break things.
-- **Tinkerer**: has built it, wants to swap in a Pi 5, a TB6612FNG driver, time-of-flight sensors, or a LiPo, and wants to know what else must change.
-- **Educator**: wants to walk a class through the build with a projector and have students "wire" it virtually first.
+**Secondary user: someone we hand a design JSON to** (a friend, a collaborator), who opens it on their own copy of the site. No accounts, no server.
 
 **Stories**
 
-| ID | As a… | I want to… | So that… |
-|---|---|---|---|
-| U1 | first-time builder | load the SARAS preset in 3D and orbit around it | I understand how the tiers stack before printing anything |
-| U2 | first-time builder | follow a tutorial step and see exactly which part goes where | I don't install the camera upside down |
-| U3 | first-time builder | click two pins and see a wire appear | I can plan wiring without a physical breadboard |
-| U4 | first-time builder | press Check and get plain-language errors with a fix | I catch reversed motor polarity before the robot spins in place |
-| U5 | first-time builder | press Test and drive with the arrow keys | I see the robot move the way my wiring would make it move |
-| U6 | any builder | see total cost in INR and USD, with the display toggled off | I can decide what to skip |
-| U7 | tinkerer | add a part that isn't in the catalog by filling a form | I can check my own hardware against the build |
-| U8 | tinkerer | swap the L298N for a TB6612FNG | the checker tells me the pin map and voltage rules changed |
-| U9 | tinkerer | export a `config.py` with the pin map from my build | my Python code matches my wiring |
-| U10 | educator | share a build as a JSON file or URL | students start from the same state |
+| ID | I want to… | So that… |
+|---|---|---|
+| U1 | open the site and see my current design spinning in 3D, grab it and rotate it | I'm on the bench immediately |
+| U2 | drag a part from the drawer onto the chassis and see it snap in with a small drop animation | placement feels physical and I can tell it landed |
+| U3 | click two pins and watch a wire draw itself between them | I can plan wiring without a breadboard |
+| U4 | press Check and see failing parts pulse in 3D with a plain-language fix | I catch reversed motor polarity before the robot spins in place |
+| U5 | press Test and drive with the arrow keys or a gamepad while the wheels spin and the face reacts | I see the robot move the way my wiring would make it move |
+| U6 | press Play and watch the whole robot assemble itself tier by tier | I understand the build order before I pick up a screwdriver |
+| U7 | move the chassis sliders (length, width, tier gap, motor offset, wheel size) and watch it rebuild | I can test a design change in seconds |
+| U8 | import my Fusion 360 STL and place real parts on it | the virtual build matches what I'm printing |
+| U9 | duplicate a design, change it, and compare both side by side in 3D | I can see what the LiPo version changes in mass, cost and power |
+| U10 | record a test run with notes and a photo of the real robot | the notebook remembers what worked |
+| U11 | add a part that isn't in the catalog by filling a form | my own hardware is covered by the checks |
+| U12 | export a `config.py` with the pin map from my design | my Python code matches my wiring |
+| U13 | see total cost in INR and USD, with the display toggled off | I can decide what to skip |
+| U14 | follow a tutorial step with the matching 3D state beside it | I don't install the camera upside down |
+| U15 | export a design as JSON (parts it depends on included) and import it on another machine | I can move between my laptop and desktop |
 
 ## 5. Site map and page specs
 
 ```
-/                      Home
-/workbench             3D Workbench (full-bleed app)
-/parts                 Parts library (browse, filter, compare)
-/parts/:id             Part detail (3D preview, pins, power, dimensions, links)
-/parts/new             Add a part (form → JSON)
-/tutorial              Tutorial overview (two tracks + troubleshooting)
-/tutorial/hardware/:n  Hardware step n
-/tutorial/software/:n  Software step n
+/                         Lab (home): current design live in 3D, my designs, recent tests, quick actions
+/workbench/:designId      3D Workbench (full-bleed)
+/designs                  All designs and their versions
+/designs/compare          Side-by-side 3D compare (?a=<design@v>&b=<design@v>)
+/chassis/:designId        Chassis designer: parametric sliders, STL / GLB / OBJ import
+/notebook/:designId       Lab notebook: test runs, notes, photos
+/cost/:designId           Cost & BOM for one design
+/parts                    Parts library (browse, filter, compare), every card a live 3D thumbnail
+/parts/:id                Part detail (large 3D preview, pins, power, dimensions, links)
+/parts/new                Add a part (form → JSON)
+/tutorial                 Tutorial overview (two tracks + troubleshooting)
+/tutorial/hardware/:n     Hardware step n, with the matching 3D state
+/tutorial/software/:n     Software step n
 /tutorial/troubleshooting
-/cost                  Cost & BOM planner
-/docs                  Data format, keyboard shortcuts, contributing, FAQ
-/about                 Credits (Tech With Anant), licenses, changelog
+/docs                     Data format, keyboard shortcuts, 3D controls, FAQ
+/about                    Credits (Tech With Anant), licenses, changelog
 ```
+
+One **persistent WebGL canvas** sits behind the whole app (drei `View` tiles it into as many viewports as a page needs), so navigating between pages never reloads the 3D context and the small 3D thumbnails on cards cost one draw call each, not one context each.
 
 ### Header (global, every page)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  ◉ SARAS Lab        Workbench   Parts   Tutorial   Cost   Docs      ⌘K  ⎇  │
+│  ◉ SARAS Lab     Lab  Workbench  Designs  Parts  Tutorial  Docs      ⌘K  ⎇  │
 └─────────────────────────────────────────────────────────────────────────────┘
    logo + wordmark          primary nav (active = underline)     search  GitHub
 ```
 
 - Sticky, 64 px tall, background `--bg` with a 1 px `--line` bottom border; becomes slightly translucent with blur on scroll.
 - Left: a small robot glyph (two round "eyes" in a rounded square, matches the display face) + wordmark "SARAS Lab" in the heading serif.
-- Center: five links. Active link gets a 2 px terracotta underline. Hover gets `--ink`.
-- Right: search button (opens a command palette: parts, tutorial steps, rules), GitHub link, and on `/workbench` an extra **Save state** chip ("Saved · 2 min ago" / "Unsaved").
+- Center: six links. Active link gets a 2 px terracotta underline. Hover gets `--ink`.
+- Right: search button (opens a command palette: designs, parts, tutorial steps, rules), GitHub link, and on `/workbench` an extra **design switcher** ("SARAS v1 ▾") and **Save state** chip ("Saved · 2 min ago" / "Unsaved").
 - Under 900 px: nav collapses into a menu button that opens a right-side sheet with the same links, large tap targets.
 - A thin 2 px progress bar under the header on tutorial pages shows position within the track.
 
@@ -188,33 +203,38 @@ The thing that makes it "one product" rather than three: **a single `Build` docu
 
 Three columns: *Build* (Workbench, Parts, Cost), *Learn* (Tutorial, Troubleshooting, Docs), *Project* (About, GitHub, Changelog). Bottom line: "Based on SARAS by Tech With Anant · Content CC BY-SA 4.0 · Code MIT" (licenses to be confirmed, see §19).
 
-### Home `/`
+### Lab `/` (home)
+
+The bench, not a landing page. The left two-thirds is a live 3D viewport of the current design.
 
 ```
-┌───────────────────────────────────────────────────────────────┐
-│ HEADER                                                        │
-├───────────────────────────────────────────────────────────────┤
-│  Build SARAS,                    ┌─────────────────────────┐  │
-│  virtually first.                │  live 3D hero: SARAS    │  │
-│                                  │  slowly orbiting, auto  │  │
-│  A 3D workbench, a parts         │  explode on scroll      │  │
-│  library and a full tutorial     └─────────────────────────┘  │
-│  for the $150 AI robot.                                       │
-│  [ Open Workbench ]  [ Start the tutorial ]                   │
-├───────────────────────────────────────────────────────────────┤
-│  ▣ Assemble      ▣ Wire & Check      ▣ Test      ▣ Price      │
-│  (four cards with a one-line promise and a tiny illustration) │
-├───────────────────────────────────────────────────────────────┤
-│  "What went wrong in the real build" — 3 callouts linking     │
-│  to the rule that catches each one                            │
-├───────────────────────────────────────────────────────────────┤
-│  Parts strip (horizontal scroll of catalog cards)             │
-├───────────────────────────────────────────────────────────────┤
-│  FOOTER                                                       │
-└───────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────┐
+│ HEADER                                                                │
+├───────────────────────────────────────────┬───────────────────────────┤
+│  ┌─────────────────────────────────────┐  │  MY DESIGNS        + New  │
+│  │  live 3D: current design            │  │  ┌─────────┐ ┌─────────┐  │
+│  │  slow auto-orbit until touched,     │  │  │ 3D thumb│ │ 3D thumb│  │
+│  │  drag to rotate, wheel to zoom,     │  │  │ SARAS v1│ │ v2 LiPo │  │
+│  │  scroll the page → tiers explode    │  │  └─────────┘ └─────────┘  │
+│  │                                     │  │  ┌─────────┐              │
+│  │  [Iso][Top][Front][Side]  explode ─●│  │  │ 3D thumb│              │
+│  └─────────────────────────────────────┘  │  │ 2.0 scaf│              │
+│  SARAS v1 · 0 fail · 2 warn · $152 ·      │  └─────────┘              │
+│  1.9 kg · 5 V rail 2.3 A typ              │  RECENT TESTS             │
+│  [ Open Workbench ]  [ Test ▶ ]  [ Play ] │  v2 LiPo · drive ok ·     │
+│                                           │  5 V warn · 2 h ago       │
+├───────────────────────────────────────────┴───────────────────────────┤
+│  Quick actions: Continue tutorial step 7 · Add part · Import STL · Compare │
+├───────────────────────────────────────────────────────────────────────┤
+│  FOOTER                                                               │
+└───────────────────────────────────────────────────────────────────────┘
 ```
 
-### Workbench `/workbench`
+- The viewport is the real Workbench scene in read-only mode; **Open Workbench** keeps the camera where you left it.
+- **Play** runs the assembly animation (§10) in place.
+- Design cards are live 3D thumbnails that start a slow spin on hover.
+
+### Workbench `/workbench/:designId`
 
 Full-bleed below the header. See §10 for behaviour.
 
@@ -233,18 +253,18 @@ Full-bleed below the header. See §10 for behaviour.
 ├──────────┴───────────────────────────────────────────────┴──────────────┤
 │ BOTTOM PANEL  [Wiring table] [Checks] [Test console] [BOM]   ▲ collapse │
 └─────────────────────────────────────────────────────────────────────────┘
- toolbar (floating, top-left of viewport): Select · Move · Rotate · Wire · Measure · Undo/Redo · Save · Load · Presets ▾ · Check ▶ · Test ▶
+ toolbar (floating, top-left of viewport): Select · Move · Rotate · Wire · Measure · Undo/Redo · Save · Versions ▾ · Play ▶ · Check ✓ · Test ▶
 ```
 
 ### Parts `/parts`
 
 - Left filter rail: category, voltage range, interface (GPIO, I2C, SPI, USB, CSI, HDMI), "in my build", "my parts".
-- Grid of cards: name, category chip, small 3D thumbnail (rendered from dimensions), key specs (V, A, mm, price), **Add to build** button.
+- Grid of cards: name, category chip, a **live 3D thumbnail** (procedural body or GLB, slow spin on hover), key specs (V, A, mm, price), **Add to design** button.
 - Compare drawer: pick up to 3 parts, side-by-side spec table.
 
 ### Part detail `/parts/:id`
 
-- Interactive 3D preview with pin labels on hover.
+- Large interactive 3D preview: orbit, zoom, pin markers with labels on hover, a **flip** button, and a toggle that shows the part's mounting footprint and clearance box.
 - Tabs: Overview · Pins · Power · Dimensions · Used in tutorial steps · Links.
 - "Known gotchas" callouts (e.g., HC-SR04 echo is 5 V; L298N drops ~2 V).
 
@@ -256,16 +276,34 @@ Full-bleed below the header. See §10 for behaviour.
 - Step page layout: left = content (MDX), right = sticky panel with the Workbench state for this step (small 3D view + "Open in Workbench"), the parts needed, and the checkpoint.
 - Prev/Next at the bottom; keyboard `[`/`]`.
 
-### Cost `/cost`
+### Designs `/designs` and compare
 
-- Table of the current build's parts with qty, unit price (USD and INR, editable), subtotal.
+- Grid of designs; each card a live 3D thumbnail, name, version count, last tested, status chips (fails / warns), cost, mass.
+- Open a design to see its versions as a vertical timeline (v1 → v2 → v3) with a one-line change note each; click a version to load it into the Workbench or to set it as the compare base.
+- **Compare** (`/designs/compare`): two synced 3D viewports (orbiting one orbits the other), a diff table underneath: parts added / removed / moved, wires added / removed, mass, cost, rail budgets, check results. "Swap sides" and "Overlay" (ghost B over A) modes.
+
+### Chassis designer `/chassis/:designId`
+
+- Left: sliders for length, width, tier count, tier gap, plate thickness, corner radius, motor outboard offset, wheelbase, wheel diameter, standoff grid. Right: the chassis rebuilds live in 3D with parts still mounted, and the checker re-runs (MECH-002 clearance, MECH-003 centre of mass).
+- **Import** STL / GLB / OBJ (drag and drop or file picker). Units prompt (mm / cm / inch), auto-centre, auto-orient, scale check against a 100 mm bar, name it (base plate, tier 2, head frame). Imported meshes become `chassis.parts[]` with their own transforms, and parts snap to their faces.
+- Export the parametric chassis as STL for printing (stretch).
+
+### Lab notebook `/notebook/:designId`
+
+- A chronological log per design. Entries are created automatically when Test runs (report attached) and manually (markdown note + photos, stored in IndexedDB).
+- Each entry pins the design version it was made against, so an old note still opens the right 3D state.
+- Filter by type (test, note, photo, checkpoint), export the notebook as markdown.
+
+### Cost `/cost/:designId`
+
+- Table of the design's parts with qty, unit price (USD and INR, editable), subtotal. Comparing versions shows the delta.
 - Toggles: "Skip display (−$30)", "I have a 3D printer" (removes acrylic/cardboard line), currency.
 - Shipping/tax fields, region presets (US, India).
 - Export CSV. Numbers are editable because prices drift; defaults carry a "last updated" date.
 
 ### Docs `/docs`
 
-Build JSON format, part JSON format, keyboard shortcuts, how checks work, how to contribute a part, FAQ.
+Design/Build JSON format, part JSON format, keyboard shortcuts, 3D controls (mouse, trackpad, touch, gamepad), how checks work, how to add a part, FAQ.
 
 ## 6. Design system
 
@@ -335,6 +373,10 @@ Button (primary terracotta, secondary outline, ghost, icon), Card, Badge/Chip (c
 |---|---|---|
 | Build tool / framework | **Vite + React 18 + TypeScript** | Fast, static output, huge ecosystem for the 3D part. |
 | 3D | **three.js** via **@react-three/fiber** + **@react-three/drei** | Declarative scene that shares React state with the UI; drei gives OrbitControls, TransformControls, HTML labels, GLTF loading, lines, environment lighting. |
+| Camera and animation | drei **`CameraControls`** (camera-controls) for damped orbit and camera flights; **`@react-spring/three`** for tweens on parts, wires and gizmos; **`maath`** for damping helpers | Smooth, interruptible animation that shares React state. |
+| Post-processing | **`@react-three/postprocessing`** (selective outline for selection/failures; soft AO) | Readable selection on a beige scene without harsh outlines. |
+| Loaders | **three-stdlib** STL / OBJ / GLTF + Draco | Import our own chassis files; load catalog GLBs. |
+| Files | **`idb-keyval`** (IndexedDB) for imported meshes and notebook photos; **`lz-string`** for share URLs | Large binary blobs don't belong in localStorage. |
 | State | **Zustand** (+ `persist` to localStorage, + `temporal` for undo/redo) | Tiny, works outside React (the rule engine and sim read the same store). |
 | Styling | **CSS variables (tokens.css) + Tailwind** | Tokens keep the beige theme in one place; Tailwind speeds up layout. |
 | Routing | **React Router v7** (library mode) | Static, simple, nested layouts for header/footer. |
@@ -443,15 +485,60 @@ interface Connection {
   color?: string;
 }
 
-interface Build {
-  id: string;
-  name: string;
+interface ChassisParams {              // drives the parametric generator (§10)
+  lengthMm: number; widthMm: number;
+  tiers: number; tierGapMm: number; plateMm: number; cornerRadiusMm: number;
+  motorOutboardMm: number;             // the "standoff fix" from the video
+  wheelbaseMm: number; wheelDiameterMm: number;
+  standoffGridMm: 5 | 10;
+}
+
+interface ImportedMesh {               // our own STL / GLB / OBJ, stored in IndexedDB
+  id: string; name: string; blobId: string; format: 'stl' | 'glb' | 'obj';
+  unit: 'mm' | 'cm' | 'in'; position: [number, number, number]; rotation: [number, number, number];
+  role?: 'base' | 'tier2' | 'head' | 'other'; triangles: number;
+}
+
+interface ChassisSpec {
+  mode: 'parametric' | 'imported' | 'mixed';
+  params: ChassisParams;
+  meshes: ImportedMesh[];
+}
+
+interface Build {                      // one design version's full state
   schemaVersion: 1;
-  chassis: { preset: 'saras-3tier'; params: { lengthMm: number; widthMm: number; tierGapMm: number } };
+  chassis: ChassisSpec;
   placements: Placement[];
   connections: Connection[];
   assumptions: Record<string, string>;  // e.g. piModel: 'Pi 4 Model B'
+}
+
+// ---- Designs, versions, notebook ----------------------------------------
+
+interface DesignVersion {
+  id: string;                 // 'v3'
+  note: string;               // 'swap 18650s for 2S LiPo + UBEC'
+  build: Build;
+  createdAt: string;
+  parentId?: string;          // version this was duplicated from
+}
+
+interface Design {
+  id: string;
+  name: string;               // 'SARAS v1', 'SARAS LiPo', 'SARAS 2.0 scaffold'
+  versions: DesignVersion[];
+  working: Build;             // autosaved working copy (unsaved changes live here)
   createdAt: string; updatedAt: string;
+}
+
+interface NotebookEntry {
+  id: string;
+  designId: string; versionId: string;
+  type: 'test' | 'note' | 'photo' | 'checkpoint';
+  createdAt: string;
+  markdown?: string;
+  report?: TestReport;        // attached automatically by Test mode
+  photoBlobIds?: string[];    // IndexedDB
 }
 
 // ---- Engine outputs --------------------------------------------------------
@@ -638,8 +725,8 @@ The exact failure from the video is a separate rule: one power bank feeding both
 ### Persistence
 
 - Autosave to localStorage on every change (debounced 500 ms), with a "Saved · just now" chip in the header.
-- Named builds: Save as…, Load, Duplicate, Delete, Export JSON, Import JSON, Reset to preset.
-- Share: `?build=` URL with the build compressed (lz-string) when it is under ~8 kB; otherwise "download JSON" prompt.
+- Designs and versions: Save as version (with a change note), switch version, Duplicate design, Delete, Export JSON (bundles imported meshes and user parts), Import JSON, Reset to preset.
+- Share: `?design=` URL with the version compressed (lz-string) when it is under ~8 kB and uses no imported meshes; otherwise "download JSON" prompt.
 
 ### Presets
 
@@ -648,10 +735,67 @@ The exact failure from the video is a separate rule: one power bank feeding both
 - **Empty chassis**.
 - **SARAS 2.0 scaffold** (later): bigger chassis, placeholder for a more powerful compute board.
 
+### Animation spec
+
+Every animation maps to a state change. Durations are for the default setting; with `prefers-reduced-motion` the fallback column applies.
+
+| Trigger | Animation | Timing | Reduced-motion fallback |
+|---|---|---|---|
+| Idle on Lab home or a part detail | slow auto-orbit (≈ 6°/s); stops on first interaction, resumes after 20 s idle | continuous | static, no auto-orbit |
+| Drag / touch / keyboard orbit | damped orbit, pan and zoom; inertia on release | damping 0.08 | no inertia |
+| View preset (Iso / Top / Front / Side) or double-click a part | camera **flies** to the target (position + look-at tween), part framed with padding | 600 ms, ease-in-out | instant cut |
+| Explode slider / toggle | tiers lift apart vertically, parts lift off their plates (0–40 mm), wires stretch with them | 400 ms per toggle; slider is direct | instant |
+| **Play (assembly)** | parts fly in from above in tutorial order, tier by tier, with a soft settle; wires draw after their parts land; scrubber and step buttons | 350 ms per part, 120 ms stagger, pause at tier ends | step-through, no motion |
+| Hover a part | lifts 1.5 mm, label fades in, pins show as dots | 150 ms | label only |
+| Select a part | selective outline in `--accent`, inspector slides in | 150 ms | outline only |
+| Drop a part (place / snap) | small drop from 8 mm with one soft bounce; snap target flashes a magnet ring | 250 ms | instant placement |
+| Move / rotate with gizmo | live; ghost of the original position stays faint until release | — | — |
+| Wire two pins | tube draws from A to B along its arc; net colour fades in; both pins pulse once | 300 ms | instant |
+| Hover a wire | whole net brightens; length label | 120 ms | — |
+| **Check** finds a fail | failing parts/wires pulse red twice, then hold a red outline; camera does not move unless you click the finding (then it flies) | 2 × 400 ms | static red outline |
+| Check passes | olive tick ripple over the robot once | 500 ms | tick icon only |
+| **Test: boot** | rails light up in order; the 3D display's screen texture plays the boot log, then the idle face | ≈ 3 s sequence | checklist only |
+| Test: drive | wheels rotate at the commanded speed and direction; chassis translates/turns on the floor; subtle body tilt on acceleration | real-time | real-time, no tilt |
+| Test: sensors | each ultrasonic sensor shows a translucent 15° cone; a ping ripple travels out and back at the measured distance; readout updates | ping every 100 ms | cone + number only |
+| Test: power | meter needles move; if a rail exceeds its supply, the Pi's status LED and the face flicker (brownout) | real-time | number turns red |
+| Face states | display screen texture animates idle → listening (blink) → thinking → talking, driven by Test events or a manual picker | per state | static face |
+| Route change | 3D canvas persists; new page's viewports fade in | 150 ms | instant |
+
+Implementation notes: all tweens are interruptible springs (`@react-spring/three`); the assembly animation is a timeline over the design's placements and wires; screen textures are a `CanvasTexture` updated from a small 2D face renderer that will later be reused by the real robot's face code; the sim runs in `useFrame` at a fixed step (60 Hz) with interpolation.
+
+### 3D controls (all input methods)
+
+| Input | Orbit | Pan | Zoom | Select | Notes |
+|---|---|---|---|---|---|
+| Mouse | left drag | right drag or `Shift`+left | wheel | click | double-click frames the part |
+| Trackpad | one-finger drag | two-finger drag | pinch | click | |
+| Touch | one finger | two fingers | pinch | tap | long-press opens the part menu |
+| Keyboard | arrows | `Shift`+arrows | `+` / `−` | `Tab` cycles parts | `F` frames selection, `Home` resets view |
+| Gamepad | right stick | left stick | triggers | `A` | same gamepad drives the robot in Test |
+
+### Chassis designer and importing our own models
+
+- The parametric chassis is a generator: `chassisParams → meshes` (plates with rounded corners and standoff holes on a 5 mm grid, motor mounts with configurable outboard offset, wheel cut-outs, neck blocks for the head). Changing a slider regenerates in under 16 ms for the default size.
+- Imported STL / GLB / OBJ files are parsed in a Web Worker, normalised (units, centre, up-axis), simplified if over 300 k triangles (with a warning), and stored in IndexedDB. The design references them by id; exporting a design bundles them.
+- Imported meshes participate in snapping (face detection for flat mounting surfaces), overlap checks (MECH-001), and wheel clearance (MECH-002).
+- Mixed mode is allowed: an imported base plate with parametric upper tiers.
+
+### Designs, versions and compare
+
+- A **design** is a named line of **versions**; each version is a full `Build` document plus a change note. Saving creates a new version only when you say so (Save as version); autosave updates the working copy.
+- Branching is just "duplicate design from version N".
+- **Compare** renders both versions in two synced viewports (one `CameraControls`, two `View`s) and computes a structural diff: placements by `instanceId` (added, removed, moved > 1 mm, rotated), connections by endpoints, chassis params, totals (mass, cost, rail budgets) and check results. Overlay mode renders B as a translucent ghost on A.
+
+### Lab notebook
+
+- Entries: `{ id, designId, versionId, type: 'test' | 'note' | 'photo' | 'checkpoint', createdAt, markdown?, report?, photos?: blobIds[] }`.
+- Test mode writes an entry automatically with the test report attached; checkpoints from the tutorial write one when passed.
+- Photos are stored in IndexedDB and shown in a lightbox next to the 3D state they were taken against, so the real build and the virtual one can be compared frame by frame.
+
 ### Performance
 
-- Instanced pin markers; wires share one material per net colour; procedural geometries cached by `componentId`.
-- Target 60 fps with 40 parts and 80 wires on an integrated GPU; degrade shadows first.
+- Instanced pin markers; wires share one material per net colour; procedural geometries cached by `componentId`; imported meshes get a simplified collision proxy.
+- Target 60 fps with 40 parts and 80 wires on an integrated GPU; degrade shadows, then AO, then outline first. A quality setting (Low / Medium / High) is remembered per device.
 - GLB models lazy-loaded and Draco-compressed; procedural fallback shows immediately.
 
 ## 11. Check and Test engine
@@ -822,10 +966,15 @@ Symptom → likely cause → rule → step. Seeded with the video's problems: ro
 │  │  ├─ parts/*.json           built-in parts, one file each
 │  │  ├─ index.ts               load, validate, merge user parts
 │  │  └─ templates.ts           pin templates for the add-part form
-│  ├─ build/                    Build schema, store (zustand + persist + temporal), presets/*.json, share codec
+│  ├─ design/                   Design + version schema, store (zustand + persist + temporal), presets/*.json, diff, share codec
+│  ├─ chassis/                  parametric generator, STL/OBJ/GLTF import worker, mesh normalisation
+│  ├─ notebook/                 entries store, photo storage (idb-keyval), markdown export
+│  ├─ compare/                  synced viewports, structural diff table, overlay mode
 │  ├─ workbench/
 │  │  ├─ Workbench.tsx          layout: drawer · viewport · inspector · bottom panel
-│  │  ├─ scene/                 Scene, Chassis, PartBody, PinMarkers, Wire, Floor, Gizmos, Cameras
+│  │  ├─ canvas/                persistent Canvas + View tiling, CameraControls, quality settings
+│  │  ├─ scene/                 Scene, Chassis, PartBody, PinMarkers, Wire, Floor, Gizmos, ScreenFace (CanvasTexture)
+│  │  ├─ animation/             springs, camera flights, explode, assembly timeline, check pulses
 │  │  ├─ tools/                 select, move, rotate, wire, measure, snapping
 │  │  └─ panels/                PartsDrawer, Inspector, WiringTable, ChecksPanel, TestConsole, BomPanel
 │  ├─ engine/
@@ -835,7 +984,7 @@ Symptom → likely cause → rule → step. Seeded with the video's problems: ro
 │  │  ├─ geometry.ts            overlap, clearance, centre of mass, FOV cones
 │  │  ├─ sim/                   boot, drive, sensors, power meter
 │  │  └─ export/                report.md, saras_config.py, wiring.csv, bom.csv
-│  ├─ pages/                    Home, Parts, PartDetail, AddPart, Tutorial*, Cost, Docs, About
+│  ├─ pages/                    Lab, Workbench, Designs, Compare, Chassis, Notebook, Parts, PartDetail, AddPart, Tutorial*, Cost, Docs, About
 │  ├─ tutorial/
 │  │  ├─ content/hardware/*.mdx · content/software/*.mdx · troubleshooting.mdx
 │  │  └─ components/            Step, Checkpoint, FromTheBuild, PinTable, WorkbenchState
@@ -850,25 +999,29 @@ Symptom → likely cause → rule → step. Seeded with the video's problems: ro
 
 Each milestone ships to the live site. "Done" means the acceptance list passes and the CI is green.
 
+3D comes first: the very first thing on the live site is SARAS, rotatable and animated. Editing, checking and testing follow; the tutorial comes after the lab works, because the lab is what we use day to day.
+
 | Milestone | Scope | Acceptance |
 |---|---|---|
 | **M0 Plan** | This document | Reviewed by you; open decisions answered. |
-| **M1 Foundation** | Vite/React/TS scaffold, tokens + Tailwind theme, Header/Footer, routing, Home (static hero placeholder), Docs skeleton, CI + Pages deploy | Live URL; beige theme on every page; header sticky and responsive; Lighthouse ≥ 90 perf/a11y/best-practices/SEO. |
-| **M2 Catalog + Parts + Cost** | Zod schema; 25+ built-in parts; `/parts` browse/filter/compare; `/parts/:id`; `/cost` with USD/INR, toggles, CSV | Every part validates; cost page reproduces the ≈ $150 total; compare works for 3 parts. |
-| **M3 Workbench v1** | Scene, chassis, procedural bodies, drawer, add/move/rotate/snap, inspector, undo/redo, autosave, named builds, import/export, SARAS preset, views, explode | Load the preset and orbit at 60 fps on a laptop; place a part from the drawer in < 3 clicks; reload restores the build. |
-| **M4 Wiring + Check** | Pin markers, wire tool, wiring table, nets, rule engine with all §11 rules, Checks panel with 3D highlighting, tutorial links | Reference preset: 0 fails; first-attempts preset: the four regression findings; a user can fix MOT-001 by rewiring and watch it clear. |
-| **M5 Test** | Boot checklist, drive test (keys + gamepad), sensor test with obstacles, power meter, test report, `saras_config.py` / CSV export | Reversed polarity visibly misbehaves in the drive test; front sensor stops the robot before a box; exported config matches the wiring table. |
-| **M6 Tutorial** | All hardware steps, all software steps (reconstructed), troubleshooting, step ↔ Workbench state sync, video timestamp links, tutorial progress bar | A new reader can go start to finish; every hardware step has a checkpoint that opens the Workbench correctly. |
-| **M7 Add-a-part + polish** | `/parts/new` form, templates, user parts storage, import/export, propose-to-catalog, GLB models for the 8 core parts, command palette, PWA offline, a11y audit, visual snapshot tests | Add an unknown sensor in < 5 min and get rule coverage; offline reload works; axe has zero serious issues. |
-| **M8 Stretch** | SARAS 2.0 track, community builds gallery (JSON in repo), dark "night bench" theme, AR preview via `<model-viewer>`, chassis STL downloads if the creator shares files | — |
+| **M1 Foundation + 3D core** | Vite/React/TS scaffold, tokens + Tailwind theme, Header/Footer, routing, CI + deploy; **persistent canvas**, parametric chassis generator, procedural part bodies, the SARAS v1 reference design rendered in 3D; damped orbit/pan/zoom on mouse, trackpad, touch and keyboard; auto-orbit idle; camera flights to Iso/Top/Front/Side; explode slider; hover labels; Lab home with the live viewport | Open the site and spin SARAS at 60 fps on a laptop and on a phone; explode and view flights animate; beige theme and header on every page; Lighthouse ≥ 90. |
+| **M2 Workbench editing + designs** | Parts drawer, add / move / rotate / snap with drop animation, inspector, undo/redo, autosave, designs and versions, import/export JSON; **chassis designer** sliders; **STL / GLB / OBJ import** | Place a part in < 3 clicks and watch it land; change wheel size with a slider and see the chassis rebuild; import a Fusion 360 STL and mount a Pi on it; reload restores everything. |
+| **M3 Catalog + Parts + Cost** | Zod schema; 25+ built-in parts; `/parts` with live 3D cards, filters, compare; `/parts/:id` large 3D preview; `/cost/:designId` with USD/INR, toggles, CSV | Every part validates; cards spin on hover; cost page reproduces the ≈ $150 total. |
+| **M4 Wiring + Check** | Pin markers, wire tool with draw animation, wiring table, nets, rule engine with all §11 rules, Checks panel with 3D pulse/highlight and camera-fly-to-finding | Reference design: 0 fails; first-attempts design: the four regression findings; fix MOT-001 by rewiring and watch it clear. |
+| **M5 Test + animation** | Boot sequence with the screen face texture, drive test (keys + gamepad) with spinning wheels and floor motion, sensor cones and pings with obstacles, power meters and brownout, **Play assembly animation** with scrubber, test report, `saras_config.py` / CSV export | Reversed polarity visibly misbehaves; the front sensor stops the robot before a box; Play assembles SARAS tier by tier; exported config matches the wiring table. |
+| **M6 Compare + Notebook** | `/designs` timeline, `/designs/compare` synced viewports + diff + overlay, `/notebook` with auto test entries, notes, photos, markdown export | Duplicate SARAS v1 to a LiPo version, compare them, and the diff lists the swapped parts and the power change; a test run appears in the notebook with its report. |
+| **M7 Tutorial** | All hardware steps, all software steps (reconstructed), troubleshooting, step ↔ 3D state sync, video timestamp links, progress bar, checkpoints writing notebook entries | Every hardware step shows the right 3D state beside it; checkpoints pass on the reference design. |
+| **M8 Add-a-part + polish** | `/parts/new` form, pin templates, user parts storage, GLB models for the 8 core parts (Draco), command palette, PWA offline, a11y audit, visual snapshot tests, quality settings for low-end GPUs | Add an unknown sensor in < 5 min and get rule coverage; offline reload works; axe has zero serious issues. |
+| **M9 Stretch** | SARAS 2.0 design track, chassis STL export, dark "night bench" theme, AR preview via `<model-viewer>`, optional password gate if we ever host it publicly | — |
 
-Suggested order of work sessions: M1 → M2 → M3 → M4 → M5 → M6 → M7. M2 before M3 because the Workbench is only as good as the catalog it renders.
+Order of work sessions: M1 → M2 → M3 → M4 → M5 → M6 → M7 → M8. M2 before M3 so we can build and test with the reference parts before the full catalog exists; the drawer in M2 starts with the SARAS parts only.
 
 ## 16. Quality bar
 
 - **Unit tests** for every rule (positive and negative case), net derivation, power budgets, geometry helpers, schema, build store (undo/redo, migrations), exporters.
 - **E2E** smoke for every route; Workbench flows: add part, wire two pins, run check, run drive test, export; visual snapshots for Home, Parts, a tutorial step, and the Workbench at the reference preset.
-- **Performance budgets**: initial JS ≤ 250 kB gzip excluding three.js chunk; three.js chunk lazy-loaded only on `/workbench`, `/parts/:id` and Home hero; LCP < 2.5 s on 4G; 60 fps in the Workbench with the reference build.
+- **Performance budgets**: initial JS ≤ 250 kB gzip excluding the three.js chunk; the three.js chunk loads once and the canvas persists across routes; LCP < 2.5 s; 60 fps in the Workbench with the reference design on an integrated GPU, 30 fps minimum on a mid-range phone with the quality setting on Low.
+- **Animation**: every tween ≤ 600 ms except Play; no layout jank during camera flights; `prefers-reduced-motion` honoured everywhere in §10's table; an in-app "Reduce motion" toggle too.
 - **Accessibility**: WCAG 2.2 AA; full keyboard path for everything the 3D does; captions for any embedded video; reduced-motion respected.
 - **Browsers**: last 2 versions of Chrome, Edge, Firefox, Safari; iPadOS Safari for the Workbench in view-only + list mode.
 - **Content review**: every electrical claim in the tutorial carries a source (datasheet or video timestamp) in a footnote; assumed values are visibly tagged.
@@ -896,15 +1049,17 @@ Suggested order of work sessions: M1 → M2 → M3 → M4 → M5 → M6 → M7. 
 Defaults are in bold; say nothing and we proceed with them.
 
 1. **Stack**: **Vite + React + TypeScript + React Three Fiber** as in §7, or do you prefer something else?
-2. **Hosting**: **GitHub Pages** or Vercel?
+2. **Hosting**: it's personal, so: **GitHub Pages on an unlisted URL** (simplest), Vercel with password protection, or local-only (`npm run dev`)? We can start on Pages and add a gate later.
 3. **Name**: **"SARAS Lab"**, or "SARAS Builder", "Hardware Lab", something else?
 4. **Pi model you actually have**: **Pi 4 Model B** assumed. Pi 5 changes the GPIO library and the power rule thresholds.
 5. **Chassis files**: do you have (or can you get) the creator's Fusion 360 / STL files? If not, the parametric placeholder stays and we add a "print your own" note.
 6. **Wheel size** you plan to use: **85 mm** assumed.
 7. **Currency default**: **show both USD and INR**, INR first for India visitors (by browser locale)?
-8. **User parts**: **local-only with JSON import/export**, or do you want sync across devices (that needs a small backend or GitHub-as-storage)?
+8. **Moving between machines**: **JSON export/import** (designs bundle their imported meshes and user parts), or do you want the repo itself to store designs (commit a `designs/*.json` folder so git is the sync)?
 9. **Videos**: **embed the YouTube players** at the cited timestamps, or link out only?
 10. **Licensing**: code **MIT**; tutorial text **CC BY-SA 4.0** with credit to Tech With Anant. OK?
+11. **Your chassis files**: if you already have STL / Fusion exports of a design you want to test, the importer in M2 is built around them. Which format do you export (STL, 3MF, STEP → GLB)?
+12. **Devices**: **desktop first, phone for viewing** assumed. If you want full editing on a tablet, M2 gets a touch-first pass.
 
 ---
 
