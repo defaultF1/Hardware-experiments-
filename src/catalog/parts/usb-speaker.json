@@ -1,0 +1,23 @@
+{
+  "id": "usb-speaker",
+  "name": "USB speaker",
+  "shortName": "USB speaker",
+  "category": "audio",
+  "role": "speak",
+  "summary": "Text-to-speech out. Its holder blocks double as the robot's neck.",
+  "body": {
+    "shape": "box",
+    "size": [90, 35, 35],
+    "color": "#2A2420",
+    "radius": 6,
+    "decor": [
+      { "type": "box", "size": [78, 24, 1.5], "pos": [0, 0, -17.2], "color": "#4A443E" },
+      { "type": "cyl", "radius": 1.2, "length": 1, "axis": "z", "pos": [38, -10, -17.8], "color": "#B5542D" }
+    ]
+  },
+  "massG": 200,
+  "power": { "typicalA": 0.3, "maxA": 0.5 },
+  "price": { "usd": 10, "inr": 800, "updated": "2026-10-26" },
+  "tags": ["usb-audio"],
+  "assumed": true
+}

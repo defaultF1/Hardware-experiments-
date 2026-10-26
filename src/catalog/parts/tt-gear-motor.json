@@ -1,0 +1,25 @@
+{
+  "id": "tt-gear-motor",
+  "name": "TT DC gear motor (1:48)",
+  "shortName": "TT motor",
+  "category": "motor",
+  "role": "drive",
+  "summary": "The yellow gear motor. Cheap, 3–6 V, low torque; the reason big tyres needed tape.",
+  "body": {
+    "shape": "group",
+    "size": [18, 22.5, 64],
+    "color": "#E6C35C",
+    "decor": [
+      { "type": "box", "size": [18, 22.5, 37], "pos": [0, 0, -16.5], "color": "#E6C35C", "radius": 1.5 },
+      { "type": "cyl", "radius": 10, "length": 25, "axis": "z", "pos": [0, 0, 14.5], "color": "#3A3A3A" },
+      { "type": "cyl", "radius": 10.5, "length": 2, "axis": "z", "pos": [0, 0, 28], "color": "#B8B8B8" },
+      { "type": "cyl", "radius": 2.7, "length": 10, "axis": "x", "pos": [13, 0, -24], "color": "#D9D2C5" },
+      { "type": "cyl", "radius": 4.5, "length": 2, "axis": "x", "pos": [10, 0, -24], "color": "#E6C35C" }
+    ]
+  },
+  "massG": 30,
+  "power": { "supplyV": { "min": 3, "max": 6 }, "typicalA": 0.2, "maxA": 1.2 },
+  "price": { "usd": 2, "inr": 120, "updated": "2026-10-26" },
+  "tags": ["dc", "gearbox", "d-shaft"],
+  "gotchas": ["Stall current is roughly 1.2 A at 6 V.", "Shaft is a 5.4 mm D-shaft; wheels push on."]
+}

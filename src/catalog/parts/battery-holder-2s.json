@@ -1,0 +1,25 @@
+{
+  "id": "battery-holder-2s",
+  "name": "2× 18650 holder (2S, 7.4 V) for the motors",
+  "shortName": "18650 ×2 holder",
+  "category": "power",
+  "role": "power",
+  "summary": "Separate rail for the motors. Later replaced by a single 2S LiPo plus a UBEC.",
+  "body": {
+    "shape": "box",
+    "size": [40, 20, 78],
+    "color": "#1B1917",
+    "radius": 1.5,
+    "decor": [
+      { "type": "cyl", "radius": 9, "length": 65, "axis": "z", "pos": [-10, 4, 0], "color": "#3F7CAC" },
+      { "type": "cyl", "radius": 9, "length": 65, "axis": "z", "pos": [10, 4, 0], "color": "#3F7CAC" },
+      { "type": "cyl", "radius": 4, "length": 2, "axis": "z", "pos": [-10, 4, 33.5], "color": "#B8B8B8" },
+      { "type": "cyl", "radius": 4, "length": 2, "axis": "z", "pos": [10, 4, -33.5], "color": "#B8B8B8" }
+    ]
+  },
+  "massG": 110,
+  "power": { "providesV": 7.4, "providesMaxA": 3, "capacityWh": 19 },
+  "price": { "usd": 8, "inr": 600, "updated": "2026-10-26" },
+  "tags": ["18650", "2S"],
+  "gotchas": ["Use protected cells or add a BMS; a 2S pack can source more current than the holder's leads are rated for."]
+}

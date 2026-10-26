@@ -1,0 +1,23 @@
+{
+  "id": "pi-camera-v2",
+  "name": "Raspberry Pi Camera Module v2",
+  "shortName": "Pi Camera",
+  "category": "camera",
+  "role": "see",
+  "summary": "Vision for LLaVA: \"what do you see\" and go-to-object. Mounted above the display.",
+  "body": {
+    "shape": "box",
+    "size": [25, 24, 1.6],
+    "color": "#1F6E3C",
+    "decor": [
+      { "type": "box", "size": [8.5, 8.5, 4.5], "pos": [0, 2, -3], "color": "#1B1917" },
+      { "type": "cyl", "radius": 2.2, "length": 1.2, "axis": "z", "pos": [0, 2, -5.6], "color": "#3F6E8C" },
+      { "type": "box", "size": [16, 4, 1.2], "pos": [0, -11, 1.2], "color": "#D9D2C5" }
+    ]
+  },
+  "massG": 3,
+  "price": { "usd": 12, "inr": 900, "updated": "2026-10-26" },
+  "tags": ["csi", "8MP"],
+  "gotchas": ["Easy to mount upside down; fix in software with a 180° rotation or remount.", "The ribbon is fragile."],
+  "assumed": true
+}

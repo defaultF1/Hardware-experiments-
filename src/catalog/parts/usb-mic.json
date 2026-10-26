@@ -1,0 +1,24 @@
+{
+  "id": "usb-mic",
+  "name": "USB omnidirectional microphone",
+  "shortName": "USB mic",
+  "category": "audio",
+  "role": "hear",
+  "summary": "Hears \"Hey SARAS\" from any direction.",
+  "body": {
+    "shape": "group",
+    "size": [55, 30, 55],
+    "color": "#2A2420",
+    "decor": [
+      { "type": "cyl", "radius": 27.5, "length": 22, "axis": "y", "pos": [0, -4, 0], "color": "#2A2420" },
+      { "type": "cyl", "radius": 20, "length": 2, "axis": "y", "pos": [0, 8, 0], "color": "#8A7F74" },
+      { "type": "sphere", "radius": 7, "pos": [0, 10, 0], "color": "#1B1917" },
+      { "type": "cyl", "radius": 1.5, "length": 1, "axis": "y", "pos": [18, 7.6, 0], "color": "#3F6E8C" }
+    ]
+  },
+  "massG": 60,
+  "power": { "typicalA": 0.05 },
+  "price": { "usd": 10, "inr": 800, "updated": "2026-10-26" },
+  "tags": ["usb-audio"],
+  "assumed": true
+}

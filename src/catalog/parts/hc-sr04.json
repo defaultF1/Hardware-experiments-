@@ -1,0 +1,26 @@
+{
+  "id": "hc-sr04",
+  "name": "HC-SR04 ultrasonic distance sensor",
+  "shortName": "HC-SR04",
+  "category": "sensor",
+  "role": "sense",
+  "summary": "Front, left and right obstacle detection. 2–400 cm, 15° cone.",
+  "body": {
+    "shape": "box",
+    "size": [45, 20, 1.6],
+    "color": "#2F6DB5",
+    "decor": [
+      { "type": "cyl", "radius": 8, "length": 12, "axis": "z", "pos": [-13, 0, -6.8], "color": "#9AA0A6" },
+      { "type": "cyl", "radius": 8, "length": 12, "axis": "z", "pos": [13, 0, -6.8], "color": "#9AA0A6" },
+      { "type": "cyl", "radius": 6.5, "length": 0.6, "axis": "z", "pos": [-13, 0, -13.1], "color": "#2A2420" },
+      { "type": "cyl", "radius": 6.5, "length": 0.6, "axis": "z", "pos": [13, 0, -13.1], "color": "#2A2420" },
+      { "type": "box", "size": [10, 4, 4], "pos": [0, -5, -2.8], "color": "#B8B8B8" },
+      { "type": "box", "size": [10.2, 2.5, 8], "pos": [0, -8, 4.8], "color": "#1B1917" }
+    ]
+  },
+  "massG": 8.5,
+  "power": { "supplyV": { "min": 4.5, "max": 5.5 }, "typicalA": 0.015 },
+  "price": { "usd": 1.5, "inr": 90, "updated": "2026-10-26" },
+  "tags": ["ultrasonic", "5V"],
+  "gotchas": ["ECHO is a 5 V output: divide it to 3.3 V before a Pi GPIO.", "Soft or angled surfaces give no echo."]
+}

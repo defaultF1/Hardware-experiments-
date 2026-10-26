@@ -1,0 +1,14 @@
+{
+  "id": "wheel-85",
+  "name": "Wheel, 85 mm (swapped from the stock 65 mm)",
+  "shortName": "Wheel 85 mm",
+  "category": "wheel",
+  "role": "drive",
+  "summary": "Bigger tyre for looks and clearance. More friction than the TT motors like; tape on the tread fixed turning.",
+  "body": { "shape": "wheel", "size": [30, 85, 85], "color": "#2B2622" },
+  "massG": 45,
+  "price": { "usd": 2, "inr": 120, "updated": "2026-10-26" },
+  "tags": ["tyre", "d-shaft"],
+  "gotchas": ["On carpet or rubber the TT motors may not have the torque to turn in place."],
+  "assumed": true
+}

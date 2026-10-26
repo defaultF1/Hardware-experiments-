@@ -1,0 +1,31 @@
+{
+  "id": "l298n-module",
+  "name": "L298N dual H-bridge motor driver module",
+  "shortName": "L298N driver",
+  "category": "motor-driver",
+  "role": "driver",
+  "summary": "Two channels; left motors in parallel on A, right motors in parallel on B.",
+  "body": {
+    "shape": "pcb",
+    "size": [43, 1.6, 43],
+    "color": "#B4382E",
+    "decor": [
+      { "type": "box", "size": [23, 24, 11], "pos": [-4, 12.8, -12], "color": "#9AA0A6" },
+      { "type": "cyl", "radius": 4, "length": 10, "axis": "y", "pos": [13, 5.8, -12], "color": "#1B1917" },
+      { "type": "box", "size": [10, 10, 8], "pos": [-16.5, 5.8, 8], "color": "#2B5AA8" },
+      { "type": "box", "size": [10, 10, 8], "pos": [16.5, 5.8, 8], "color": "#2B5AA8" },
+      { "type": "box", "size": [15, 10, 8], "pos": [-12, 5.8, 17.5], "color": "#2B5AA8" },
+      { "type": "box", "size": [15, 8, 2.5], "pos": [8, 4.8, 20], "color": "#1B1917" },
+      { "type": "box", "size": [4, 8, 1.6], "pos": [16, 4.8, 15], "color": "#1B1917" }
+    ]
+  },
+  "massG": 26,
+  "power": { "supplyV": { "min": 5, "max": 35 }, "providesV": 5, "providesMaxA": 0.5 },
+  "price": { "usd": 3, "inr": 180, "updated": "2026-10-26" },
+  "tags": ["h-bridge", "2A"],
+  "gotchas": [
+    "Drops about 2 V between VS and the motors; a 7.4 V pack gives the motors roughly 5.4 V.",
+    "2 A per channel. Two TT motors in parallel can exceed this at stall.",
+    "Remove the ENA/ENB jumpers to use PWM speed control."
+  ]
+}

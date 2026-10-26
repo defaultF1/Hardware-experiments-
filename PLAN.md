@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **Status** | v0.1 — planning. Nothing is built yet. This file is the source of truth for *what* we build and *in what order*. |
+| **Status** | v0.2 — **M1 built** (foundation + 3D core, see §15 and the build log at the end). This file is the source of truth for *what* we build and *in what order*. |
 | **Source videos** | [Hardware Build (Aug 15, 2025)](https://www.youtube.com/watch?v=IT1uBUsOmUY) · [System Overview (Jul 5, 2025)](https://www.youtube.com/watch?v=e-nbSGRFP4Q) |
 | **Look & feel** | Clean beige, lots of air, sticky header, serif headings, mono for pins and code. **3D-first**: wherever hardware is shown it is real, rotatable, animated 3D, never a flat image. |
 | **Shape** | A personal lab for us, not a public product. Single-user, static, no backend, local-first (designs saved in the browser, exportable as JSON). |
@@ -402,7 +402,7 @@ Button (primary terracotta, secondary outline, ghost, icon), Card, Badge/Chip (c
 
 ## 8. Data model
 
-All units: **millimetres, grams, volts, amps, USD**. INR shown via an editable rate (default 84 ₹/$ with a "last updated" date).
+All units: **millimetres, grams, volts, amps, USD**. INR shown via an editable rate (default 84 ₹/$ with a "last updated" date). Scene axes as built: **x = robot right, y = up, z = robot back**, so the robot faces −z; body sizes are `[x, y, z]` in those axes (a wheel is `[width, diameter, diameter]`).
 
 ```ts
 // ---- Catalog ---------------------------------------------------------------
@@ -960,13 +960,13 @@ Symptom → likely cause → rule → step. Seeded with the video's problems: ro
 │  └─ favicon.svg
 ├─ src/
 │  ├─ main.tsx · app/           router, RootLayout, Header, Footer, CommandPalette
-│  ├─ design/                   tokens.css, ui/ (Button, Card, Badge, Table, Tabs, Drawer, Callout, …)
+│  ├─ ui/                       tokens.css (Tailwind @theme), Button, Card, Chip, Callout, Logo
 │  ├─ catalog/
 │  │  ├─ schema.ts              Zod schemas → TS types
 │  │  ├─ parts/*.json           built-in parts, one file each
 │  │  ├─ index.ts               load, validate, merge user parts
 │  │  └─ templates.ts           pin templates for the add-part form
-│  ├─ design/                   Design + version schema, store (zustand + persist + temporal), presets/*.json, diff, share codec
+│  ├─ designs/                  Design + version types, store (zustand), presets/, bom.ts, diff and share codec (M2/M6)
 │  ├─ chassis/                  parametric generator, STL/OBJ/GLTF import worker, mesh normalisation
 │  ├─ notebook/                 entries store, photo storage (idb-keyval), markdown export
 │  ├─ compare/                  synced viewports, structural diff table, overlay mode
@@ -1004,7 +1004,7 @@ Each milestone ships to the live site. "Done" means the acceptance list passes a
 | Milestone | Scope | Acceptance |
 |---|---|---|
 | **M0 Plan** | This document | Reviewed by you; open decisions answered. |
-| **M1 Foundation + 3D core** | Vite/React/TS scaffold, tokens + Tailwind theme, Header/Footer, routing, CI + deploy; **persistent canvas**, parametric chassis generator, procedural part bodies, the SARAS v1 reference design rendered in 3D; damped orbit/pan/zoom on mouse, trackpad, touch and keyboard; auto-orbit idle; camera flights to Iso/Top/Front/Side; explode slider; hover labels; Lab home with the live viewport | Open the site and spin SARAS at 60 fps on a laptop and on a phone; explode and view flights animate; beige theme and header on every page; Lighthouse ≥ 90. |
+| **M1 Foundation + 3D core** ✅ | Vite/React/TS scaffold, tokens + Tailwind theme, Header/Footer, routing, CI + deploy; **persistent canvas**, parametric chassis generator, procedural part bodies, the SARAS v1 reference design rendered in 3D; damped orbit/pan/zoom on mouse, trackpad, touch and keyboard; auto-orbit idle; camera flights to Iso/Top/Front/Side; explode slider; hover labels; Lab home with the live viewport | Open the site and spin SARAS at 60 fps on a laptop and on a phone; explode and view flights animate; beige theme and header on every page; Lighthouse ≥ 90. |
 | **M2 Workbench editing + designs** | Parts drawer, add / move / rotate / snap with drop animation, inspector, undo/redo, autosave, designs and versions, import/export JSON; **chassis designer** sliders; **STL / GLB / OBJ import** | Place a part in < 3 clicks and watch it land; change wheel size with a slider and see the chassis rebuild; import a Fusion 360 STL and mount a Pi on it; reload restores everything. |
 | **M3 Catalog + Parts + Cost** | Zod schema; 25+ built-in parts; `/parts` with live 3D cards, filters, compare; `/parts/:id` large 3D preview; `/cost/:designId` with USD/INR, toggles, CSV | Every part validates; cards spin on hover; cost page reproduces the ≈ $150 total. |
 | **M4 Wiring + Check** | Pin markers, wire tool with draw animation, wiring table, nets, rule engine with all §11 rules, Checks panel with 3D pulse/highlight and camera-fly-to-finding | Reference design: 0 fails; first-attempts design: the four regression findings; fix MOT-001 by rewiring and watch it clear. |
@@ -1136,3 +1136,26 @@ WHEEL_DIAMETER_MM = 85
 - **UBEC** — a small switching regulator (battery eliminator circuit) that makes a clean 5 V from a LiPo.
 - **CSI** — the Pi's camera ribbon connector.
 - **Tier** — one of the three stacked plates of the SARAS chassis.
+
+---
+
+## Build log
+
+### M1 — Foundation + 3D core (done)
+
+What shipped:
+
+- Vite 7 + React 19 + TypeScript, Tailwind v4 with the beige tokens in `src/ui/tokens.css`, Fraunces / Inter / JetBrains Mono.
+- Sticky header (logo, six-link nav with active underline, search with ⌘K / Ctrl K command palette, GitHub, mobile sheet; design chip on the Workbench), footer.
+- **One persistent WebGL canvas** behind the app (`PersistentCanvas` + drei `View.Port`); every 3D rectangle is a `View` with its own camera and background. Navigating never reloads the context.
+- Parametric three-tier chassis generator (`src/chassis/generate.ts`): plates with rounded corners, corner standoffs, Pi standoffs, the outboard motor brackets (the clearance fix), sensor brackets, neck blocks, head tray, display frame feet.
+- Eleven SARAS parts as validated JSON with procedural bodies and decor: Pi 4B, L298N, TT motor, 85 mm wheel with the tape stripe, HC-SR04, 7" display with a **live blinking face** (canvas texture), Pi Camera, USB mic, USB speaker, 5 V power bank, 2S 18650 holder.
+- SARAS v1 reference design: 19 placements across base / tier 2 / head, with mirrored motors and per-part explode directions.
+- Camera: damped orbit / pan / zoom on mouse, trackpad, touch and keyboard (`CameraControls`), auto-orbit when idle that resumes 20 s after the last touch, camera flights to Iso / Top / Front / Side, Fit, double-click or `F` to fly to a part, `prefers-reduced-motion` honoured.
+- Explode slider and animated toggle (tiers lift, parts lift off their plates, wheels and sensors move outward), hover lift + label, click to select.
+- Pages: Lab (live bench + designs with 3D thumbnails + stats), Workbench (parts drawer grouped by tier, viewport with toolbar, inspector, BOM panel), Designs, Parts (live 3D cards, filters, search), Part detail (orbitable), Tutorial outline, Docs, About, 404.
+- Unit tests for the chassis generator, explode math, catalog validation and BOM; CI workflow; GitHub Pages deploy workflow (`VITE_BASE` set from the repo name, SPA 404 fallback).
+
+Verified in a headless browser: no runtime errors on any page; view presets, drag orbit, keyboard views, focus flights, hover labels, palette, and phone layouts.
+
+Deferred to the next milestones, as planned: drag-to-place and snapping, chassis sliders and STL import, autosave and versions (M2); full catalog and cost page (M3); wires and checks (M4); test mode and assembly playback (M5).

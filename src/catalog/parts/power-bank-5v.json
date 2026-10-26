@@ -1,0 +1,26 @@
+{
+  "id": "power-bank-5v",
+  "name": "5 V USB power bank, 10 000 mAh",
+  "shortName": "5 V power bank",
+  "category": "power",
+  "role": "power",
+  "summary": "Powers the Pi (and display). Sits under tier 2, held by standoffs so it cannot slide.",
+  "body": {
+    "shape": "box",
+    "size": [68, 15, 140],
+    "color": "#D9D2C5",
+    "radius": 5,
+    "decor": [
+      { "type": "box", "size": [12, 5, 4], "pos": [-15, 0, 69], "color": "#1B1917" },
+      { "type": "box", "size": [12, 5, 4], "pos": [5, 0, 69], "color": "#1B1917" },
+      { "type": "box", "size": [8, 3, 4], "pos": [22, 0, 69], "color": "#8F9397" },
+      { "type": "cyl", "radius": 1.2, "length": 1, "axis": "y", "pos": [-24, 7.8, -50], "color": "#3F6E8C" }
+    ]
+  },
+  "massG": 200,
+  "power": { "providesV": 5, "providesMaxA": 2.4, "capacityWh": 37 },
+  "price": { "usd": 12, "inr": 1000, "updated": "2026-10-26" },
+  "tags": ["usb-a", "usb-c"],
+  "gotchas": ["Most banks serve one port under load and shut the other down: this is why one bank could not feed Pi and motors."],
+  "assumed": true
+}

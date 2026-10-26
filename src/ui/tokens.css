@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   SARAS Lab design tokens — the beige theme (PLAN.md §6).
+   Tailwind v4 reads @theme and emits CSS variables on :root plus utilities
+   such as bg-bg, text-ink, border-line, font-display.
+--------------------------------------------------------------------------- */
+@theme {
+  --color-bg: #F4EFE6;
+  --color-bg-elev: #FBF8F2;
+  --color-bg-sunken: #EAE2D3;
+  --color-line: #DDD3C0;
+  --color-line-strong: #C9BBA3;
+  --color-ink: #2A2420;
+  --color-ink-2: #5C524A;
+  --color-ink-3: #8A7F74;
+  --color-accent: #B5542D;
+  --color-accent-ink: #FFF8F0;
+  --color-pass: #5F6F52;
+  --color-warn: #C9922B;
+  --color-fail: #A8402F;
+  --color-info: #3F6E8C;
+
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --radius-ctl: 6px;
+  --radius-card: 12px;
+  --radius-hero: 20px;
+
+  --shadow-float: 0 8px 24px rgba(42, 36, 32, 0.08);
+}
+
+:root {
+  color-scheme: light;
+  /* wire colours follow electronics convention, not the theme */
+  --wire-5v: #C83C32;
+  --wire-vin: #D97A1F;
+  --wire-gnd: #1B1917;
+  --wire-3v3: #D9B23A;
+  --wire-signal: #3F6E8C;
+  --wire-pwm: #2E8A86;
+  --wire-bus: #6F5BA8;
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 72;
+  letter-spacing: -0.015em;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+code, kbd, .font-mono { font-family: var(--font-mono); font-feature-settings: "tnum" 1; }
+
+kbd {
+  display: inline-block;
+  min-width: 1.5em;
+  padding: 0 0.4em;
+  border: 1px solid var(--color-line-strong);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--color-bg-elev);
+  font-size: 0.78em;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--color-ink-2);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-ctl);
+}
+
+::selection { background: #e8c9b7; }
+
+/* the persistent WebGL canvas sits above the page, transparent, pointer-events off */
+.lab-canvas {
+  position: fixed !important;
+  inset: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* a 3D view: the DOM element the canvas renders into */
+.lab-view {
+  position: relative;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+  background: var(--color-bg-sunken);
+}
+.lab-view:focus-visible { outline-offset: -2px; }
+
+/* overlays inside a view must float above the canvas */
+.lab-overlay { position: absolute; z-index: 20; pointer-events: none; }
+.lab-overlay > * { pointer-events: auto; }
+
+/* header blur once scrolled */
+.header-scrolled { background: color-mix(in srgb, var(--color-bg-elev) 86%, transparent); backdrop-filter: blur(10px); }
+
+.prose p { margin: 0 0 1em; max-width: 68ch; }
+.prose h2 { margin: 2.2em 0 0.6em; font-size: 1.6rem; }
+.prose h3 { margin: 1.8em 0 0.5em; font-size: 1.2rem; }
+.prose ul { padding-left: 1.2em; margin: 0 0 1em; }
+.prose li { margin: 0.25em 0; }
+.prose table { border-collapse: collapse; width: 100%; font-size: 0.925rem; margin: 0 0 1.5em; }
+.prose th { text-align: left; font-weight: 600; color: var(--color-ink-2); border-bottom: 1px solid var(--color-line-strong); padding: 0.5em 0.6em; }
+.prose td { border-bottom: 1px solid var(--color-line); padding: 0.5em 0.6em; vertical-align: top; }
+.prose tr:nth-child(even) td { background: color-mix(in srgb, var(--color-bg-sunken) 45%, transparent); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* range slider */
+input[type="range"].lab-range {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 4px; border-radius: 2px;
+  background: var(--color-line-strong);
+}
+input[type="range"].lab-range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--color-accent); border: 2px solid var(--color-bg-elev);
+  box-shadow: 0 1px 3px rgba(42,36,32,0.25); cursor: pointer;
+}
+input[type="range"].lab-range::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--color-accent); border: 2px solid var(--color-bg-elev); cursor: pointer;
+}
