@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router'
+import { createBrowserRouter, createMemoryRouter } from 'react-router'
 import { RootLayout } from './RootLayout'
 import { LabPage } from '../pages/Lab'
 import { WorkbenchPage } from '../pages/Workbench'
@@ -10,8 +10,7 @@ import { DocsPage } from '../pages/Docs'
 import { AboutPage } from '../pages/About'
 import { NotFoundPage } from '../pages/NotFound'
 
-export const router = createBrowserRouter(
-  [
+const routes = [
     {
       path: '/',
       element: <RootLayout />,
@@ -28,6 +27,10 @@ export const router = createBrowserRouter(
         { path: '*', element: <NotFoundPage /> },
       ],
     },
-  ],
-  { basename: import.meta.env.BASE_URL.replace(/\/$/, '') || '/' },
-)
+]
+
+/** VITE_ROUTER=memory builds a self-contained bundle (no URL routing), used for hosted previews. */
+export const router =
+  import.meta.env.VITE_ROUTER === 'memory'
+    ? createMemoryRouter(routes, { initialEntries: ['/'] })
+    : createBrowserRouter(routes, { basename: import.meta.env.BASE_URL.replace(/\/$/, '') || '/' })
